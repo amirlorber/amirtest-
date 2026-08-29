@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AmirTest - האפליקציה שלי ב-AWS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #2563eb;
+      --primary-hover: #1d4ed8;
+      --bg-color: #f8fafc;
+      --card-bg: #ffffff;
+      --text-color: #0f172a;
+      --text-secondary: #64748b;
+      --border-color: #e2e8f0;
+      --radius: 12px;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Rubik', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    header h1 {
+      font-size: 2.5rem;
+      color: var(--primary-color);
+      margin-bottom: 0.5rem;
+    }
+
+    header p {
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+    }
+
+    .badge {
+      display: inline-block;
+      background-color: #d1fae5;
+      color: #065f46;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      margin-top: 0.5rem;
+    }
+
+    main {
+      width: 100%;
+      max-width: 600px;
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 2rem;
+    }
+
+    .input-group {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input[type="text"]:focus {
+      border-color: var(--primary-color);
+    }
+
+    button.btn-add {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    button.btn-add:hover {
+      background-color: var(--primary-hover);
+    }
+
+    ul.task-list {
+      list-style: none;
+    }
+
+    ul.task-list li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid var(--border-color);
+      transition: background 0.15s;
+    }
+
+    ul.task-list li:last-child {
+      border-bottom: none;
+    }
+
+    ul.task-list li:hover {
+      background-color: #f1f5f9;
+    }
+
+    .task-text {
+      cursor: pointer;
+      user-select: none;
+      flex: 1;
+    }
+
+    .task-text.completed {
+      text-decoration: line-through;
+      color: var(--text-secondary);
+    }
+
+    .delete-btn {
+      background: none;
+      border: none;
+      color: #ef4444;
+      cursor: pointer;
+      font-size: 1.2rem;
+    }
+
+    footer {
+      margin-top: 3rem;
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>🚀 האתר של עמיר ב-AWS</h1>
+    <p>נבנתה בעזרת Copilot / Claude ב-VS Code</p>
+    <div class="badge">תמיכה בשמירת נתונים מקומית (LocalStorage)</div>
+  </header>
+
+  <main>
+    <div class="input-group">
+      <input type="text" id="taskInput" placeholder="הכנס משימה או יעד חדש..." onkeypress="if(event.key==='Enter') addTask()">
+      <button class="btn-add" onclick="addTask()">הוסף</button>
+    </div>
+
+    <ul class="task-list" id="taskList"></ul>
+  </main>
+
+  <footer>
+    נבנה בהצלחה בתיקייה c:\CW Progect\Amirtest
+  </footer>
+
+  <script>
+    let tasks = JSON.parse(localStorage.getItem('amir_tasks')) || [
+      { text: 'להריץ את האפליקציה מקומית', completed: true },
+      { text: 'להעלות ולהריץ ב-AWS', completed: false }
+    ];
+
+    function renderTasks() {
+      const list = document.getElementById('taskList');
+      list.innerHTML = '';
+
+      tasks.forEach((task, index) => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+          <span class="task-text ${task.completed ? 'completed' : ''}" onclick="toggleTask(${index})">
+            ${task.completed ? '✅ ' : '⏳ '} ${task.text}
+          </span>
+          <button class="delete-btn" onclick="removeTask(${index})">🗑️</button>
+        `;
+        list.appendChild(li);
+      });
+
+      localStorage.setItem('amir_tasks', JSON.stringify(tasks));
+    }
+
+    function addTask() {
+      const input = document.getElementById('taskInput');
+      const text = input.value.trim();
+      if (!text) return;
+
+      tasks.push({ text, completed: false });
+      input.value = '';
+      renderTasks();
+    }
+
+    function toggleTask(index) {
+      tasks[index].completed = !tasks[index].completed;
+      renderTasks();
+    }
+
+    function removeTask(index) {
+      tasks.splice(index, 1);
+      renderTasks();
+    }
+
+    renderTasks();
+  </script>
+</body>
+</html>
