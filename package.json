@@ -1,0 +1,10 @@
+{
+  "name": "amirtest",
+  "version": "1.0.0",
+  "description": "AmirTest Web Application",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx http-server . -p 8080 -o",
+    "publish": "aws s3 cp index.html s3://amir-test-app-2026/index.html --content-type \"text/html\" && git add . && git commit -m \"Publish update\" && git push"
+  }
+}
